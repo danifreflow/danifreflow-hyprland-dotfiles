@@ -1,0 +1,77 @@
+{
+    "modules-left": ["hyprland/workspaces", "hyprland/submap"],
+    "modules-center": ["clock", "idle_inhibitor"],
+    "modules-right": ["tray", "network", "pulseaudio","battery", "custom/power"],
+
+    "hyprland/submap": {
+        "format": "<span style=\"italic\">{}</span>"
+    },
+    "network": {
+    	"interface": "*",
+        "format-wifi": "{essid} ({signalStrength}%) E",
+        "format-ethernet": "{ifname} A",
+        "format-disconnected": "D", 
+        "max-length": 50,
+        "on-click": "kitty -e 'nmtui'"
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        },
+    },
+    "tray": {
+        "icon-size": 15,
+        "spacing": 10
+    },
+    "clock": {
+        // "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        // "format-alt": "{:%Y-%m-%d}"
+		"on-click": "gnome-calendar"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon} ",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": "󰂲 {icon} {format_source}",
+        "format-muted": "0% {icon} ",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+	"custom/power": {
+		"format": " ",
+		"on-click": "wlogout"
+	},
+
+   	"battery": {
+        	"format": "{capacity}% {icon}",
+        	"format-alt": "{time} {icon}",
+		"format-alt-click": "click-right",
+        	"format-icons": ["", "", "", "", ""],
+        	"format-charging": "{capacity}% ",
+        	"interval": 30,
+        	"states": {
+            		"warning": 25,
+            		"critical": 10
+        	},
+        	"tooltip": false
+    },
+	"network": {
+        	"interface": "wlo1",
+        	"format": "{icon}",
+        	"format-alt": "{ipaddr}/{cidr} {icon}",
+        	"format-alt-click": "click-right",
+        	"format-icons": {
+            		"wifi": [""],
+            		"ethernet": [""],
+            		"disconnected": [""]
+        	},
+        		"on-click": "kitty -e nmtui",
+    			"tooltip": false
+    	},
+}
