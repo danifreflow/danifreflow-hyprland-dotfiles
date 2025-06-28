@@ -24,7 +24,7 @@ yay -S --needed --noconfirm \
   gtk-engine-murrine 
 
 # --------- COPIAR DOTFILES ---------
-CONFIG_FILES=(hypr kitty Kvantum mako Thunar waybar wlogout wofi xfce4 zathura)
+CONFIG_FILES=(hypr kitty mako Thunar waybar wlogout wofi xfce4 zathura)
 echo -e "${YELLOW}[+] Copiando dotfiles a ~/.config...${NC}"
 
 for dir in "${CONFIG_FILES[@]}"; do
@@ -33,4 +33,6 @@ for dir in "${CONFIG_FILES[@]}"; do
   cp -r .config/$dir/* ~/.config/$dir/
 done
 
+gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 echo -e "${GREEN}[✔] Instalación completada. Reinicia la sesión para aplicar cambios.${NC}"
