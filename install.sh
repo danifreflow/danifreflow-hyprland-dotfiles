@@ -20,7 +20,7 @@ yay -S --needed --noconfirm \
   hyprland hyprpaper hypridle hyprlock \
   kitty thunar wofi waybar wlogout mako \
   brightnessctl grim slurp wl-clipboard \
-  qt5ct qt6ct kvantum-qt5 kvantum-qt6 \
+  bzmenu wttrbar \
   gtk-engine-murrine 
 
 # --------- COPIAR DOTFILES ---------
