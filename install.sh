@@ -20,9 +20,7 @@ yay -S --needed --noconfirm \
   hyprland hyprpaper hypridle hyprlock \
   kitty thunar wofi waybar wlogout mako \
   brightnessctl grim slurp wl-clipboard \
-  qt5ct qt6ct kvantum-qt5 kvantum-qt6 \
-  gtk-engine-murrine 
-
+  xdg-desktop-portal-hyprland nerd-fonts 
 # --------- COPIAR DOTFILES ---------
 CONFIG_FILES=(hypr kitty Kvantum mako Thunar waybar wlogout wofi xfce4 zathura)
 echo -e "${YELLOW}[+] Copiando dotfiles a ~/.config...${NC}"
@@ -33,4 +31,7 @@ for dir in "${CONFIG_FILES[@]}"; do
   cp -r .config/$dir/* ~/.config/$dir/
 done
 
+
+echo -e "${YELLOW}[+] Copiando /wallpapers a ~/${NC}"
+cp -r ./wallpapers ~/
 echo -e "${GREEN}[✔] Instalación completada. Reinicia la sesión para aplicar cambios.${NC}"

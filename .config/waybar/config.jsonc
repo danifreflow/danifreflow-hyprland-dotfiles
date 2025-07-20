@@ -109,6 +109,7 @@
     },
     "custom/spotify": {
         "exec": "/usr/bin/python3 ~/.config/waybar/modules/mediaplayer.py --player spotify",
+        "max-length": 15,
         "format": " 󰓇 {}",
         "return-type": "json",
         "on-click": "playerctl play-pause",
