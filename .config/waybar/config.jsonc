@@ -13,7 +13,6 @@
       "hyprland/workspaces"
     ],
     "modules-right": [
-      "backlight/slider",
       "custom/weather",
       "bluetooth",
       "pulseaudio",
@@ -116,12 +115,6 @@
         "on-scroll-up": "playerctl next",
         "on-scroll-down": "playerctl previous"
     },
-    "backlight/slider": {
-    "min": 0,
-    "max": 100,
-    "orientation": "horizontal",
-    "device": "intel_backlight"
-},
   "custom/logout": {
     "format": "    ",
     "on-click": "wlogout"

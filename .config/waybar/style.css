@@ -138,31 +138,3 @@ label:focus {
 #pulseaudio.muted {
   color: @text;
 }
-
-#backlight-slider {
-    padding: 5px;
-}
-
-#backlight-slider slider {
-    min-height: 10px;
-    min-width: 10px;
-    background-color: white;
-    border-radius: 50%;
-    border: 1px solid gray;
-}
-
-#backlight-slider trough {
-    min-height: 10px;
-    min-width: 80px;
-    border-radius: 5px;
-    background-color: #222;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-
-#backlight-slider highlight {
-    min-height: 10px;
-    border-radius: 5px;
-    background-color: #f00;
-}
