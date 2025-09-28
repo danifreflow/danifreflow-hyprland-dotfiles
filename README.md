@@ -1,4 +1,4 @@
-# danifreflow-hyprland-dotfiles
+# danifreflow hyprland dotfiles 🐧
 
 Personal Hyprland dotfiles configuration with Catppuccin Mocha theme and Wayland-optimized applications.
 
