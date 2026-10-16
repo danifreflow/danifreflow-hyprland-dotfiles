@@ -8,6 +8,7 @@ Personal Hyprland dotfiles configuration with Catppuccin Mocha theme and Wayland
 - [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Monitors](#monitors)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Components](#components)
 - [Waybar Modules](#waybar-modules)
@@ -21,7 +22,8 @@ Personal Hyprland dotfiles configuration with Catppuccin Mocha theme and Wayland
 - **Terminal**: Kitty with optimized configuration
 - **Launcher**: Wofi with modern design
 - **Notifications**: Mako with consistent styling
-- **File Manager**: Thunar
+- **File Managers**: Yazi (terminal, keyboard-driven) and Thunar (GTK, mouse-friendly)
+- **Icons**: Papirus-Dark with Catppuccin Mocha mauve folders
 - **Screen Lock**: Hyprlock with elegant design
 - **Power Management**: Hypridle for automatic suspension
 
@@ -38,34 +40,47 @@ Personal Hyprland dotfiles configuration with Catppuccin Mocha theme and Wayland
 
 ## Installation
 
-### Prerequisites
+The installer detects your distribution, installs every dependency, backs up
+your current `~/.config` and copies the dotfiles and the wallpaper.
 
-- Arch Linux (or derivatives)
-- `yay` (AUR helper)
-
-### Automatic Installation
+| Distribution | Support |
+|---|---|
+| Arch Linux and derivatives (EndeavourOS, CachyOS, Manjaro...) | Full: official repos + AUR |
+| Ubuntu 24.04+ and derivatives (**Slimbook OS**, Kubuntu, Pop!_OS, Mint...) | Full: Hyprland from [`ppa:cppiber/hyprland`](https://launchpad.net/~cppiber/+archive/ubuntu/hyprland) |
+| Any other distro | Dotfiles only (`--dotfiles-only`), install the packages yourself |
 
 ```bash
 git clone https://github.com/tuusuario/danifreflow-hyprland-dotfiles.git
 cd danifreflow-hyprland-dotfiles
-chmod +x install.sh
 ./install.sh
 ```
 
-### Manual Installation
+Then log out and pick **Hyprland** in your login screen (SDDM, GDM...).
 
-1. Install required packages:
+### Options
+
 ```bash
-yay -S hyprland hyprpaper hypridle hyprlock kitty thunar wofi waybar wlogout mako brightnessctl grim slurp wl-clipboard xdg-desktop-portal-hyprland nerd-fonts
+./install.sh                  # packages + dotfiles
+./install.sh --dotfiles-only  # only copy dotfiles and wallpapers (any distro)
+./install.sh --packages-only  # only install packages
 ```
 
-2. Copy configurations:
-```bash
-cp -r .config/* ~/.config/
-cp -r wallpapers ~/
-```
+### What the installer does
 
-3. Restart session
+- **Arch**: installs everything with `pacman`, and `wlogout`, `bzmenu`, `wttrbar` from AUR (installs `yay` if no AUR helper is present).
+- **Ubuntu / Slimbook OS**: adds the Hyprland PPA (signed key, no `add-apt-repository` needed), installs the packages with `apt`, downloads the `bzmenu` and `wttrbar` binaries from GitHub to `/usr/local/bin` and the JetBrainsMono / Inconsolata Nerd Fonts to `~/.local/share/fonts`.
+- **Dotfiles**: backs up any existing config to `~/.config-backup/<date>/`, copies everything to `~/.config`, rewrites absolute paths to your `$HOME`, copies the wallpaper to `~/wallpapers` and creates `~/capturas` for screenshots.
+- `~/.config/hypr/monitors.lua` is **never overwritten** if it already exists, since monitors are specific to each machine.
+- Finally it validates the Hyprland config with `Hyprland --verify-config`.
+
+### Requirements
+
+- **Hyprland >= 0.55** for the main Lua config (`hyprland.lua`). On older versions Hyprland falls back to the legacy `hyprland.conf`.
+- On Ubuntu-based distros, **24.04 (noble) or newer**: on 22.04 the PPA only ships Hyprland 0.54.
+
+### Dependencies (for other distros)
+
+`hyprland` (>= 0.55) `hyprpaper` `hypridle` `hyprlock` `xdg-desktop-portal-hyprland` `waybar` `kitty` `thunar` `wofi` `wlogout` `mako` `zathura` `pavucontrol` `brightnessctl` `grim` `slurp` `wl-clipboard` `playerctl` `wlsunset` `networkmanager` `python-gobject` `qt6ct` `kvantum` `bzmenu` `wttrbar` + JetBrainsMono and Inconsolata Nerd Fonts.
 
 ## Configuration
 
@@ -73,16 +88,25 @@ cp -r wallpapers ~/
 
 ```
 ├── .config/
-│   ├── hypr/           # Main Hyprland configuration
+│   ├── hypr/
+│   │   ├── hyprland.lua    # Main Hyprland config (Hyprland >= 0.55)
+│   │   ├── monitors.lua    # Per-machine monitor layout (never overwritten)
+│   │   ├── hyprland.conf   # Legacy config, only used by Hyprland < 0.55
+│   │   ├── hyprlock.conf / hypridle.conf / hyprpaper.conf / mocha.conf
 │   ├── waybar/         # Status bar and modules
 │   ├── kitty/          # Terminal
 │   ├── wofi/           # Application launcher
 │   ├── mako/           # Notification system
 │   ├── wlogout/        # Logout menu
+│   ├── yazi/           # Terminal file manager (theme + drag & drop keymap)
 │   └── zathura/        # PDF viewer
 ├── assets/             # Screenshots
 ├── wallpapers/         # Wallpapers
-└── install.sh         # Installation script
+├── scripts/
+│   ├── common.sh       # Shared helpers + dotfiles deployment
+│   ├── arch.sh         # Arch / EndeavourOS packages
+│   └── ubuntu.sh       # Ubuntu / Slimbook OS packages
+└── install.sh          # Installer (detects the distro)
 ```
 
 ## Keyboard Shortcuts
@@ -93,8 +117,9 @@ cp -r wallpapers ~/
 | `Super + T` | Open terminal (Kitty) |
 | `Super + D` | Open launcher (Wofi) |
 | `Super + E` | Open file manager (Thunar) |
+| `Super + R` | Open terminal file manager (Yazi) |
 | `Super + V` | Toggle floating window |
-| `Super + M` | Close Hyprland |
+| `Super + Shift + E` | Exit Hyprland |
 
 ### Window Management
 | Shortcut | Action |
@@ -103,7 +128,7 @@ cp -r wallpapers ~/
 | `Super + Shift + H/J/K/L` | Move active window |
 | `Super + Shift + Q` | Close active window |
 | `Super + P` | Toggle pseudotiling |
-| `Super + J` | Toggle window split |
+| `Super + O` | Toggle window split (side by side ↔ stacked) |
 
 ### Workspaces
 | Shortcut | Action |
@@ -119,6 +144,7 @@ cp -r wallpapers ~/
 | `Print` | Screenshot (selected area) |
 | `Super + Z` | Lock screen |
 | `Super + B` | Open Bluetooth menu (bzmenu) |
+| `Super + M` | Move the laptop screen to the other side of the external monitors |
 
 ### Multimedia Keys
 | Key | Action |
@@ -131,7 +157,15 @@ cp -r wallpapers ~/
 
 ## Components
 
-### Hyprland (`hyprland.conf`)
+### Hyprland (`hyprland.lua`)
+
+Since Hyprland 0.55 the config is written in Lua and `hyprland.conf` (hyprlang)
+is deprecated; it will stop being read in 0.57. `hyprland.conf` is kept only as
+a fallback for older Hyprland versions. Validate changes with:
+
+```bash
+Hyprland --verify-config -c ~/.config/hypr/hyprland.lua
+```
 
 **Main compositor** that manages windows, animations and visual effects.
 
@@ -144,7 +178,7 @@ cp -r wallpapers ~/
 - **Power management**: Integration with hypridle
 
 **Special configurations:**
-- Automatic laptop screen closure
+- Automatic laptop screen closure and monitor arrangement (`monitors.lua`)
 - Optimized XWayland scaling
 - Window rules for specific applications
 
@@ -210,6 +244,23 @@ cp -r wallpapers ~/
 - Wallpaper: `~/wallpapers/greenbus.jpg`
 - Automatic preload
 - Multi-monitor support
+
+### Yazi (`~/.config/yazi`)
+
+**Terminal file manager**, opened with `Super + R` in an almost opaque kitty window.
+
+- Theme: Catppuccin Mocha with a mauve accent (`catppuccin-mocha-mauve`, generated from the
+  [official flavor](https://github.com/yazi-rs/flavors) replacing the blue accent)
+- Previews for images, PDFs, videos, archives and code
+- **Drag & drop**: select files with `Space` and press `Ctrl + N` to open a
+  [dragon](https://github.com/mwh/dragon) window, then drag them into any app.
+  Dropping files *into* Yazi is not supported: use Thunar for that.
+
+### Icons
+
+The installer puts **Papirus-Dark** in `~/.local/share/icons` with the
+[Catppuccin folder colors](https://github.com/catppuccin/papirus-folders) (`cat-mocha-mauve`)
+and enables it for GTK apps like Thunar. No distro package is needed.
 
 ### Zathura (`zathurarc`)
 
@@ -308,6 +359,26 @@ Waybar is the status bar that displays system information and provides quick acc
 - Handles play/pause, next/previous
 - JSON output for Waybar integration
 
+## Monitors
+
+`~/.config/hypr/monitors.lua` arranges the screens automatically using each
+monitor's real resolution and scale, so it works on any machine and with any
+number of external monitors:
+
+- The laptop screen (`eDP-*`) goes to the **left or right of all external monitors**.
+- `Super + M` switches sides; the choice is remembered across restarts
+  (`~/.local/state/hypr/laptop_side`).
+- External monitors keep their relative order.
+- Closing the lid turns the laptop screen off; opening it rearranges everything.
+
+To force a resolution, scale or rotation for a specific monitor, add it to the
+`overrides` table (names/descriptions from `hyprctl monitors`):
+
+```lua
+overrides["desc:Samsung Electric Company S24D330 0x5A5A5131"] = { scale = 1 }
+overrides["HDMI-A-1"] = { mode = "2560x1440@144", transform = 1 }
+```
+
 ## Customization
 
 ### Colors (Catppuccin Mocha)
@@ -320,10 +391,13 @@ Colors are defined in `mocha.conf`:
 
 ### Wallpapers
 
-Place your wallpapers in `~/wallpapers/` and update `hyprpaper.conf`:
-```bash
-preload = ~/wallpapers/your-wallpaper.jpg
-wallpaper = , ~/wallpapers/your-wallpaper.jpg
+Place your wallpapers in `~/wallpapers/` and update `hyprpaper.conf`
+(and the `background` path in `hyprlock.conf`):
+```ini
+wallpaper {
+    monitor =
+    path = ~/wallpapers/your-wallpaper.jpg
+}
 ```
 
 ### Waybar Modules
@@ -334,19 +408,20 @@ Custom modules are located in `~/.config/waybar/modules/`:
 
 ### Fonts
 
-**JetBrainsMono Nerd Font** is used for icons and symbols. Install with:
-```bash
-yay -S nerd-fonts-jetbrains-mono
-```
+**JetBrainsMono** and **Inconsolata** Nerd Fonts are used for icons and symbols.
+The installer installs them (`ttf-jetbrains-mono-nerd ttf-inconsolata-nerd` on Arch,
+downloaded from the Nerd Fonts releases on Ubuntu).
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Waybar not appearing**: Verify that `waybar` is installed and running
-2. **Notifications not working**: Ensure `mako` is running
-3. **Screenshots**: Install `grim` and `slurp`
-4. **Audio**: Verify that `pulseaudio` is working
+1. **Config errors after a Hyprland update**: run `Hyprland --verify-config -c ~/.config/hypr/hyprland.lua`
+2. **Lid switch not working**: systemd-logind may handle it first; see `HandleLidSwitch` in `/etc/systemd/logind.conf`
+3. **Waybar not appearing**: Verify that `waybar` is installed and running
+4. **Notifications not working**: Ensure `mako` is running
+5. **Screenshots**: Install `grim` and `slurp`
+6. **Audio**: Verify that `pulseaudio` is working
 
 ### Logs
 

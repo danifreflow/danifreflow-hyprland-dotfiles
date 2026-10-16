@@ -1,37 +1,82 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# Instalador de danifreflow-hyprland-dotfiles.
+#
+# Detecta la distribución, instala los paquetes necesarios y copia los
+# dotfiles y el wallpaper. Soportadas: Arch y derivadas (EndeavourOS...),
+# Ubuntu 24.04+ y derivadas (Slimbook OS...). En cualquier otra distro se
+# pueden copiar solo los dotfiles con --dotfiles-only.
 
-# --------- COLORES ---------
-GREEN='\033[1;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
+set -euo pipefail
 
-echo -e "${YELLOW}[+] Comprobando yay...${NC}"
-if ! command -v yay &> /dev/null; then
-  echo -e "${YELLOW}[!] yay no encontrado. Instalando...${NC}"
-  sudo pacman -S --needed git base-devel
-  git clone https://aur.archlinux.org/yay.git
-  cd yay && makepkg -si && cd ..
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/common.sh
+source "$REPO_DIR/scripts/common.sh"
+
+usage() {
+    cat <<EOF
+Uso: ./install.sh [opción]
+
+  (sin opciones)     Instala paquetes y copia los dotfiles
+  --dotfiles-only    Solo copia dotfiles y wallpapers (cualquier distro)
+  --packages-only    Solo instala paquetes
+  -h, --help         Muestra esta ayuda
+EOF
+}
+
+do_packages=true
+do_dotfiles=true
+case "${1:-}" in
+    "")               ;;
+    --dotfiles-only)  do_packages=false ;;
+    --packages-only)  do_dotfiles=false ;;
+    -h|--help)        usage; exit 0 ;;
+    *)                usage; exit 1 ;;
+esac
+
+if [[ $EUID -eq 0 ]]; then
+    error "No ejecutes este script como root; pedirá sudo cuando lo necesite."
+    exit 1
 fi
 
-# --------- PAQUETES NECESARIOS ---------
-echo -e "${YELLOW}[+] Instalando paquetes necesarios...${NC}"
-yay -S --needed --noconfirm \
-  hyprland hyprpaper hypridle hyprlock \
-  kitty thunar wofi waybar wlogout mako \
-  brightnessctl grim slurp wl-clipboard \
-  xdg-desktop-portal-hyprland nerd-fonts 
-# --------- COPIAR DOTFILES ---------
-CONFIG_FILES=(hypr kitty Kvantum mako Thunar waybar wlogout wofi xfce4 zathura)
-echo -e "${YELLOW}[+] Copiando dotfiles a ~/.config...${NC}"
+detect_family() {
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    local ids=" ${ID:-} ${ID_LIKE:-} "
+    if [[ "$ids" == *" arch "* ]]; then
+        echo "arch"
+    elif [[ "$ids" == *" ubuntu "* ]]; then
+        echo "ubuntu"
+    else
+        echo "unknown"
+    fi
+}
 
-for dir in "${CONFIG_FILES[@]}"; do
-  echo -e "${GREEN} → Instalando $dir${NC}"
-  mkdir -p ~/.config/$dir
-  cp -r .config/$dir/* ~/.config/$dir/
-done
+if $do_packages; then
+    family="$(detect_family)"
+    # shellcheck disable=SC1091
+    distro_name="$(. /etc/os-release && echo "${PRETTY_NAME:-$ID}")"
+    step "Distribución detectada: ${distro_name}"
 
+    case "$family" in
+        arch)   source "$REPO_DIR/scripts/arch.sh" ;;
+        ubuntu) source "$REPO_DIR/scripts/ubuntu.sh" ;;
+        *)
+            error "Distribución no soportada para instalar paquetes automáticamente."
+            error "Instala Hyprland >= 0.55 y las dependencias del README, y después ejecuta:"
+            error "  ./install.sh --dotfiles-only"
+            exit 1
+            ;;
+    esac
+    install_packages
+fi
 
-echo -e "${YELLOW}[+] Copiando /wallpapers a ~/${NC}"
-cp -r ./wallpapers ~/
-echo -e "${GREEN}[✔] Instalación completada. Reinicia la sesión para aplicar cambios.${NC}"
+if $do_dotfiles; then
+    deploy_dotfiles
+    install_icon_theme
+    verify_hyprland_config
+fi
+
+echo
+ok "Instalación completada."
+info "Cierra sesión y elige 'Hyprland' en la pantalla de inicio de sesión."
+info "Ajusta los monitores en ~/.config/hypr/monitors.lua si hace falta."

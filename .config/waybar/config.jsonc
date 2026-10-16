@@ -24,7 +24,9 @@
       "format": "{}",
       "max-length": 35,
       "rewrite": {
-        "": "Harsh"
+        "": "Harsh",
+        // Quitar el indicador animado que Claude Code pone en el título de la terminal
+        "^(?:◐|◑|◒|◓|✳) (.*)": "$1"
       },
       "separate-outputs": true
     },
@@ -32,7 +34,9 @@
       "format": "{icon}",
       "on-click": "activate",
       "format-icons": {
-        "active": " "
+        "active": " ",
+        "visible": " ",
+        "default": " "
       },
       "sort-by-number": true
     },

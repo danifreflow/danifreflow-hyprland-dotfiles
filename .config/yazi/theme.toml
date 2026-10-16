@@ -1,0 +1,6 @@
+# Catppuccin Mocha (https://github.com/yazi-rs/flavors) con acento mauve,
+# a juego con hyprlock y las carpetas de Papirus.
+# Para volver al original (acento azul): dark = "catppuccin-mocha"
+[flavor]
+dark  = "catppuccin-mocha-mauve"
+light = "catppuccin-mocha-mauve"

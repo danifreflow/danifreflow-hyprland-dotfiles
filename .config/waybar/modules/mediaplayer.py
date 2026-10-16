@@ -15,11 +15,9 @@ from typing import List
 logger = logging.getLogger(__name__)
 
 def signal_handler(sig, frame):
-    logger.info("Received signal to stop, exiting")
-    sys.stdout.write("\n")
-    sys.stdout.flush()
-    # loop.quit()
-    sys.exit(0)
+    # Salir sin tocar stdout: escribir aquí puede interrumpir otra escritura
+    # en curso y provocar "RuntimeError: reentrant call"
+    os._exit(0)
 
 
 class PlayerManager:

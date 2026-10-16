@@ -1,0 +1,8 @@
+# Arrastrar con el ratón: ponte encima de un archivo (o marca varios con
+# Espacio) y pulsa Ctrl+N. Se abre una ventanita de dragon desde la que se
+# arrastran a cualquier app; se cierra sola al soltar.
+# %s = archivos seleccionados (o el del cursor si no hay ninguno marcado)
+[[mgr.prepend_keymap]]
+on   = "<C-n>"
+run  = "shell -- dragon-drop --all --and-exit %s"
+desc = "Arrastrar los archivos seleccionados con el ratón"
